@@ -1,7 +1,6 @@
 {
   "name": "browser-app",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "webpack -w",
@@ -17,5 +16,6 @@
     "typescript": "^5.1.6",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
-  }
+  },
+  "description": ""
 }
