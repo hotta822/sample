@@ -1,4 +1,5 @@
 import {EventListener} from "./EventListener"
+import {Task} from "./Task"
 
 class Application {
     private readonly eventListener = new EventListener
@@ -11,7 +12,14 @@ class Application {
     
     private handleSubmit = (e:Event) =>{
         e.preventDefault() //submitのデフォルトに設定されているform送信先が指定されていない場合、現在のURLに対してフォームの送信を行う処理を防ぐ(prevent)ようにする
-        console.log("submitted")
+        
+        const titleInput = document.getElementById("title") as HTMLInputElement
+
+        if(!titleInput.value) return
+        
+        const task = new Task({title:titleInput.value})
+        console.log(task)
+
     }
 }
 
