@@ -1,5 +1,5 @@
 import {EventListener} from "./EventListener"
-import {Task} from "./Task"
+import {Status,Task,statusMap} from "./Task"
 import {TaskCollection} from "./TaskCollection"
 import {TaskRenderer} from "./TaskRenderer"
 
@@ -14,8 +14,12 @@ class Application {
 
     start(){
         const createForm = document.getElementById("createForm") as HTMLElement //タスクを作成するためにHTMLのidがcreateFormの要素を取得する
-        
+        const deleteAllDoneTaskButton = document.getElementById("deleteAllDoneTask") as HTMLElement
+
         this.eventListener.add("submit-handler","submit",createForm,this.handleSubmit) //id名,フォームを送信するイベント,要素の指定,行う処理
+        this.eventListener.add("click-handler","click",deleteAllDoneTaskButton,this.handleClickDeleteAllDoneTasks)
+
+        this.taskRenderer.subscribeDragAndDrop(this.handleDropAndDrop)
     }
     
     private handleSubmit = (e:Event) =>{
@@ -40,13 +44,43 @@ class Application {
         titleInput.value = ""
     }
 
-    private handleClickDeleteTask = (task:Task) => {
-        if (!window.confirm(`「${task.title}」を削除してよろしいですか？`)) return
-        
+    private executeDeleteTask = (task:Task) =>{
         this.eventListener.remove(task.id)
         this.taskCollection.delete(task)
         this.taskRenderer.remove(task)
     }
+
+    private handleClickDeleteTask = (task:Task) => {
+        if (!window.confirm(`「${task.title}」を削除してよろしいですか？`)) return
+        
+        this.executeDeleteTask(task)
+    }
+
+    private handleDropAndDrop = (el:Element,sibling:Element|null,newStatus:Status)=>{
+        const taskId = this.taskRenderer.getId(el)
+
+        if(!taskId)return
+        
+        const task = this.taskCollection.find(taskId)
+
+        if(!task) return
+        task.update({status:newStatus})
+        this.taskCollection.update(task)
+
+        console.log(sibling)
+    }
+
+    
+
+    private  handleClickDeleteAllDoneTasks= () =>{
+        if(!window.confirm("DONEのタスクを一括削除してよろしいですか？")) return
+
+        const doneTasks = this.taskCollection.filter(statusMap.done)
+
+        doneTasks.forEach((task)=>this.executeDeleteTask(task))
+    }
+
+   
 }
 
 window.addEventListener("load",()=>{

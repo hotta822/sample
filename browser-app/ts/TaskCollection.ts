@@ -1,14 +1,61 @@
-import {Task} from "./Task"
+import {Status,Task} from "./Task"
+
+    const STORAGE_KEY = 'TASKS'
 
 export class TaskCollection{
-    private tasks : Task[] = []
+    private readonly storage
+    private tasks
+
+    constructor(){
+        this.storage = localStorage
+        this.tasks = this.getStoredTasks()
+    }
 
     add(task:Task){
         this.tasks.push(task) //importしてきたTaskで作成したtaskをtasksの配列に入れる
-
+        this.updateStorage()
     }
     
     delete(task:Task){
         this.tasks = this.tasks.filter(({id}) => id !== task.id) //filter(){}条件に当てはまる要素だけで配列を作る
+        this.updateStorage()
     }
-}
+
+    find(id:string){
+        return this.tasks.find((task) => task.id === id)
+
+    }
+
+    update(task:Task){
+        this.tasks = this.tasks.map((item) => {
+            if(item.id === task.id) return task
+            return item
+        })
+    }
+
+    filter(filterStatus:Status){
+        return this.tasks.filter(({status})=> status === filterStatus)
+    }
+
+    private updateStorage(){
+        this.storage.setItem(STORAGE_KEY,JSON.stringify(this.tasks))
+    }
+
+    private getStoredTasks(){
+        const jsonString = this.storage.getItem(STORAGE_KEY)
+        
+        if(!jsonString) return[]
+
+        try{
+            const storedTasks: any[]= JSON.parse(jsonString)
+            const tasks = storedTasks.map((task)=>new Task(task))
+
+            console.log(tasks)
+            return tasks
+        }catch{
+            this.storage.removeItem(STORAGE_KEY)
+            return []
+        }
+
+        }
+    }
