@@ -8,11 +8,17 @@ export const statusMap = {
 
 export type Status = typeof statusMap[keyof typeof statusMap] 
 
+    export type TaskObject = {
+        id:string
+        title:string
+        status:Status
+    }
+
 export class Task{
     readonly id
     title
     status
-
+    
     constructor(properties:{ id?:string,title:string,status?:Status}){
         this.id = properties.id || uuid()
         this.title = properties.title
@@ -32,4 +38,5 @@ export class Task{
 
         return true
     }
+
 }
