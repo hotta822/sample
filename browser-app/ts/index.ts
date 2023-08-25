@@ -13,8 +13,14 @@ class Application {
     )
 
     start(){
+        const taskItems = this.taskRenderer.renderAll(this.taskCollection)
         const createForm = document.getElementById("createForm") as HTMLElement //タスクを作成するためにHTMLのidがcreateFormの要素を取得する
         const deleteAllDoneTaskButton = document.getElementById("deleteAllDoneTask") as HTMLElement
+
+        taskItems.forEach(({task,deleteButtonEl})=>{
+            this.eventListener.add(task.id,"click",deleteButtonEl,
+                                    ()=>this.handleClickDeleteTask(task))
+        })
 
         this.eventListener.add("submit-handler","submit",createForm,this.handleSubmit) //id名,フォームを送信するイベント,要素の指定,行う処理
         this.eventListener.add("click-handler","click",deleteAllDoneTaskButton,this.handleClickDeleteAllDoneTasks)

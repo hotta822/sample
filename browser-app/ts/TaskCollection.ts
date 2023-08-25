@@ -60,7 +60,8 @@ export class TaskCollection{
         }
     }
 }
-
+    //メソッドではなくfunctionなのはどうして？methodはクラスの中でのみ使用できる。
+    //functionは複数のクラス、関数に使いまわせる。この後使いまわす予定がある？
     function assertIsTaskObjects(value:any):asserts value is TaskObject[]{
         if(!Array.isArray(value)||value.every((item) => Task.validate(item))){
             throw new Error("引数「value」はTaskObject[]型と一致しません。")
