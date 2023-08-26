@@ -3,19 +3,26 @@
 //イベントに登録したハンドラを削除するためにはaddEventListenerで登録した "イベント名","要素","ハンドラ"をコード内で保持する必要がある
 //コードが複雑になるのを防ぐためにEventListener.tsに処理を記述することで後々ハンドラを実装しやすいようにするのが目的
 //
+import {v4 as uuid } from "uuid"
+
+type Handler<T> = T extends keyof HTMLElementEventMap
+    ?(e: HTMLElementEventMap[T]) => void
+    :(e:Event) => void
 
 type Listeners = {
     [id: string]:{
         event: string
         element:HTMLElement
-        handler:(e:Event)=>void
+        handler:Handler<string>
     }
 }
 
 export class EventListener{
     private readonly listeners : Listeners={}
 
-    add(listenerId:string,event:string,element:HTMLElement,handler:(e:Event)=>void){
+    //listenerIdにデフォルト値をを渡すことでオプショナルな引数に変更
+    //オプショナルの引数は最後に記述する
+    add<T extends string>(event:T,element:HTMLElement,handler:Handler<T>,listenerId = uuid()){
         this.listeners[listenerId] = {
             event,
             element,

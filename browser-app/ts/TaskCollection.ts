@@ -59,11 +59,45 @@ export class TaskCollection{
             return []
         }
     }
+
+    //タスクの位置を動かしたときに配列の順番を入れ替えることで対応させる
+    //taskIndexでtaskの添え字を取得、targetIndexで移動後の添え字を取得
+    moveAboveTarget(task:Task,target:Task){
+        const taskIndex = this.tasks.indexOf(task)
+        const targetIndex = this.tasks.indexOf(target)
+        
+        //タスクを下に移動させたい時、taskが消える分配列が一つずれるため targetIndexに-1をする
+        this.changeOrder(task,taskIndex,taskIndex < targetIndex ? targetIndex - 1 :targetIndex)
+    }
+
+    //
+    moveToLast(task:Task){
+        //リストを移動させる場合は元のリストにあったtaskを削除して、移動先のリストにtaskを追加する
+        const taskIndex = this.tasks.indexOf(task)
+
+        this.changeOrder(task, taskIndex,this.tasks.length)
+    }
+
+    private changeOrder(task:Task,taskIndex:number,targetIndex:number){
+        this.tasks.splice(taskIndex,1)  //taskを消す
+        this.tasks.splice(targetIndex,0,task)   //移動先にtaskを挿入する
+        this.updateStorage() //localStorageの更新
+    }
 }
-    //メソッドではなくfunctionなのはどうして？methodはクラスの中でのみ使用できる。
-    //functionは複数のクラス、関数に使いまわせる。この後使いまわす予定がある？
+
+    
     function assertIsTaskObjects(value:any):asserts value is TaskObject[]{
-        if(!Array.isArray(value)||value.every((item) => Task.validate(item))){
+        //配列ではない または 型情報が間違っている とエラー
+        if(!Array.isArray(value) || !value.every((item) => Task.validate(item))){
             throw new Error("引数「value」はTaskObject[]型と一致しません。")
         }
     }
+
+    /*
+    assertIsTaskObjectsでやりたいこと
+    ユーザーがlocalStorageを変更した場合、正しくない状態で表示されてしまう場合がある。
+    しかし、storedTasksがany型の配列として宣言されているため、変更されてもそのまま動作してしまう
+    それを防ぐため、assertsを使うことで予めstoredTasksの型を定義することが目標
+    assertIsTaskObjectsではlocalStorageから受けとったvalueをTaskObject型と定義した上で受け取った
+    受け取ったvalueが正しい値であることを確認している
+     */
